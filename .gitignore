@@ -1,0 +1,5 @@
+venv/
+*.ENC
+*.gz
+*.sw[op]
+

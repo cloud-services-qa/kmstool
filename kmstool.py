@@ -41,9 +41,12 @@ def get_profile(profile='default'):
 
 
 # connect to kms with boto3
-def connect(profile="default"):
+def connect(profile="default", region="default"):
     # if using default profile or role we dont need to pass creds
-    if profile == "default":
+    if region != "default":
+        session = Session(region_name=region)
+        kms = session.client('kms')
+    elif profile == "default":
         kms = client('kms')
     else:
         profile = get_profile(profile)
@@ -109,10 +112,12 @@ def main():
     parser.add_option("-k","--key_id", help="KMS Key-id")
     parser.add_option("-s","--key_spec", help="KMS KeySpec", default="AES_256")
     parser.add_option("-p","--profile", help="AWS Profile", default="default")
+    parser.add_option("-r","--region", help="AWS region", default="default")
     (opts, args) = parser.parse_args()
 
     # connect to kms
-    kms = connect(opts.profile)
+    kms = connect(opts.profile, opts.region)
+    region = opts.region
     workingdir = "/var/tmp/kmstool/" # directory for temp files
     try:
         mkdir(workingdir)
